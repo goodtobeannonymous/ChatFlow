@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-  android:icon="@drawable/ic_chatflow"
-android:roundIcon="@drawable/ic_chatflow"  <application
+ android:icon="@drawable/ic_chatflow"
+android:roundIcon="@drawable/ic_chatflow""  <application
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:label="ChatFlow"
         android:usesCleartextTraffic="false"
