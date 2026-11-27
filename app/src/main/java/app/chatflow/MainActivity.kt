@@ -2,16 +2,13 @@ package app.chatflow
 
 import android.app.Activity
 import android.os.Bundle
-import android.os.Build
 import android.content.Intent
 import android.net.Uri
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.webkit.ValueCallback
-import android.view.WindowInsets
 import android.view.WindowManager
-import android.view.View
 import android.graphics.Color
 
 class MainActivity : Activity() {
@@ -38,19 +35,8 @@ class MainActivity : Activity() {
         web.settings.allowContentAccess = true
         web.settings.setSupportZoom(false)
 
-        // Keep the app content below the status bar and above the system navigation area.
-        web.setOnApplyWindowInsetsListener { view, insets ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                val bars = insets.getInsets(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
-                val density = resources.displayMetrics.density
-                view.setPadding(0, maxOf(bars.top, (28 * density).toInt()), 0, maxOf(bars.bottom, (20 * density).toInt()))
-            } else {
-                @Suppress("DEPRECATION")
-                val density = resources.displayMetrics.density
-                view.setPadding(0, maxOf(insets.systemWindowInsetTop, (28 * density).toInt()), 0, maxOf(insets.systemWindowInsetBottom, (20 * density).toInt()))
-            }
-            insets
-        }
+        // Let Android fit the WebView between the system bars.
+        // Do not add a second set of status/navigation bar insets here.
 
         web.webChromeClient = object : WebChromeClient() {
             override fun onShowFileChooser(
@@ -78,7 +64,6 @@ class MainActivity : Activity() {
         }
         web.webViewClient = WebViewClient()
         setContentView(web)
-        web.requestApplyInsets()
         web.loadUrl("file:///android_asset/index.html")
     }
 
