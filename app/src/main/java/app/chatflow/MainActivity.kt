@@ -9,6 +9,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.webkit.ValueCallback
 import android.view.WindowManager
+import android.view.View
 import android.graphics.Color
 
 class MainActivity : Activity() {
@@ -35,8 +36,9 @@ class MainActivity : Activity() {
         web.settings.allowContentAccess = true
         web.settings.setSupportZoom(false)
 
-        // Let Android fit the WebView between the system bars.
-        // Do not add a second set of status/navigation bar insets here.
+        // Let Android's normal decor fitting handle system bars. Avoid adding
+        // a second WebView inset, which previously pushed the header too far down.
+        web.setPadding(0, 0, 0, 0)
 
         web.webChromeClient = object : WebChromeClient() {
             override fun onShowFileChooser(
@@ -64,6 +66,7 @@ class MainActivity : Activity() {
         }
         web.webViewClient = WebViewClient()
         setContentView(web)
+        web.requestApplyInsets()
         web.loadUrl("file:///android_asset/index.html")
     }
 
