@@ -9,7 +9,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.webkit.ValueCallback
 import android.view.WindowManager
-import android.view.View
 import android.graphics.Color
 
 class MainActivity : Activity() {
@@ -36,9 +35,24 @@ class MainActivity : Activity() {
         web.settings.allowContentAccess = true
         web.settings.setSupportZoom(false)
 
-        // Let Android's normal decor fitting handle system bars. Avoid adding
-        // a second WebView inset, which previously pushed the header too far down.
-        web.setPadding(0, 0, 0, 0)
+        // Apply only the real system-bar insets. Never add arbitrary dp padding.
+        web.setOnApplyWindowInsetsListener { view, insets ->
+            val density = resources.displayMetrics.density
+            val top = if (android.os.Build.VERSION.SDK_INT >= 30) {
+                insets.getInsets(android.view.WindowInsets.Type.statusBars()).top
+            } else {
+                @Suppress("DEPRECATION")
+                insets.systemWindowInsetTop
+            }
+            val bottom = if (android.os.Build.VERSION.SDK_INT >= 30) {
+                insets.getInsets(android.view.WindowInsets.Type.navigationBars()).bottom
+            } else {
+                @Suppress("DEPRECATION")
+                insets.systemWindowInsetBottom
+            }
+            view.setPadding(0, top, 0, bottom)
+            insets
+        }
 
         web.webChromeClient = object : WebChromeClient() {
             override fun onShowFileChooser(
@@ -66,7 +80,6 @@ class MainActivity : Activity() {
         }
         web.webViewClient = WebViewClient()
         setContentView(web)
-        web.requestApplyInsets()
         web.loadUrl("file:///android_asset/index.html")
     }
 
