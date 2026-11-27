@@ -11,6 +11,7 @@ import android.webkit.WebViewClient
 import android.webkit.ValueCallback
 import android.view.WindowInsets
 import android.view.WindowManager
+import android.view.View
 import android.graphics.Color
 
 class MainActivity : Activity() {
@@ -24,6 +25,8 @@ class MainActivity : Activity() {
 
         window.statusBarColor = Color.rgb(10, 12, 18)
         window.navigationBarColor = Color.rgb(10, 12, 18)
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS or WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.decorView.systemUiVisibility = 0
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
@@ -39,10 +42,12 @@ class MainActivity : Activity() {
         web.setOnApplyWindowInsetsListener { view, insets ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 val bars = insets.getInsets(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
-                view.setPadding(0, bars.top, 0, bars.bottom)
+                val density = resources.displayMetrics.density
+                view.setPadding(0, maxOf(bars.top, (28 * density).toInt()), 0, maxOf(bars.bottom, (20 * density).toInt()))
             } else {
                 @Suppress("DEPRECATION")
-                view.setPadding(0, insets.systemWindowInsetTop, 0, insets.systemWindowInsetBottom)
+                val density = resources.displayMetrics.density
+                view.setPadding(0, maxOf(insets.systemWindowInsetTop, (28 * density).toInt()), 0, maxOf(insets.systemWindowInsetBottom, (20 * density).toInt()))
             }
             insets
         }
