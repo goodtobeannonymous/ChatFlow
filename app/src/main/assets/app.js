@@ -1,6 +1,6 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let messages=[], people=[], visibleStart=0, pageSize=120, currentTheme='aurora', filtered=null;
-const themes=['aurora','forest','amoled','pearl'];
+const themes = ['aurora', 'amoled', 'ocean', 'sunset', 'lavender'];
 const dateRe=/^(\d{1,2}\/\d{1,2}\/\d{2,4}),?\s+(\d{1,2}:\d{2}(?::\d{2})?\s*[AP]M)\s+-\s+(.+?):\s?(.*)$/i;
 function normalizeName(s){return s.replace(/\s*\([^)]*\)\s*/g,' ').replace(/\s+/g,' ').trim()||s.trim()}
 function parseDate(d,t){
@@ -161,9 +161,160 @@ $('#searchInput').addEventListener('input',e=>{const q=e.target.value.toLowerCas
 function go(id){$$('.screen').forEach(s=>s.classList.toggle('active',s.id===id));$$('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.go===id));haptic()}
 $$('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
 $('#openReader').onclick=()=>go('reader');
-function setTheme(t){currentTheme=t;document.body.dataset.theme=t;localStorage.setItem('chatflow_theme',t);$$('.theme-option').forEach(b=>b.classList.toggle('selected',b.dataset.themeChoice===t));if(messages.length){renderOverview();renderStats()}haptic()}
-$$('[data-theme-choice]').forEach(b=>b.onclick=()=>setTheme(b.dataset.themeChoice));
-$('#themeQuick').onclick=()=>{const i=themes.indexOf(currentTheme);setTheme(themes[(i+1)%themes.length])};
-currentTheme=localStorage.getItem('chatflow_theme')||'aurora';setTheme(currentTheme);
+
+const themeConfig = {
+  aurora: {
+    label: 'Aurora',
+    description: 'Northern lights · Purple and violet',
+    colors: ['#0d0b18','#171326','#211b35','#f7f4ff','#aaa1c2','#a78bfa','#ec8df5','#29213f','#6843a7']
+  },
+  amoled: {
+    label: 'Midnight AMOLED',
+    description: 'Pure black · Electric blue',
+    colors: ['#000000','#090909','#141414','#f5f7fb','#9299a5','#168bff','#65b7ff','#171717','#075bb8']
+  },
+  ocean: {
+    label: 'Ocean Glass',
+    description: 'Deep ocean · Cyan highlights',
+    colors: ['#071522','#10283b','#17394e','#effaff','#9bbacb','#39c6df','#65a9ff','#18364a','#087da9']
+  },
+  sunset: {
+    label: 'Sunset',
+    description: 'Warm coral · Amber glow',
+    colors: ['#211018','#321b25','#482633','#fff3ec','#c8a6a0','#ff956f','#ffc36e','#492b32','#ce654c']
+  },
+  lavender: {
+    label: 'Lavender',
+    description: 'Soft lilac · Elegant light purple',
+    colors: ['#f5f1fc','#ffffff','#eae2f6','#29233b','#82758f','#9271d5','#c29bea','#eee8f7','#8060c8']
+  }
+};
+
+function applyThemeColors(theme) {
+  const c = themeConfig[theme] || themeConfig.aurora;
+  const keys = [
+    '--bg','--surface','--surface2','--text','--muted',
+    '--line','--accent','--accent2','--bubbleA','--bubbleB'
+  ];
+
+  // The color array includes nine entries; assign the ten CSS variables
+  // using the explicit palette below.
+  const palettes = {
+    aurora: ['#0d0b18','#171326','#211b35','#f7f4ff','#aaa1c2','#302844','#a78bfa','#ec8df5','#29213f','#6843a7'],
+    amoled: ['#000000','#090909','#141414','#f5f7fb','#9299a5','#242424','#168bff','#65b7ff','#171717','#075bb8'],
+    ocean: ['#071522','#10283b','#17394e','#effaff','#9bbacb','#23475b','#39c6df','#65a9ff','#18364a','#087da9'],
+    sunset: ['#211018','#321b25','#482633','#fff3ec','#c8a6a0','#57313a','#ff956f','#ffc36e','#492b32','#ce654c'],
+    lavender: ['#f5f1fc','#ffffff','#eae2f6','#29233b','#82758f','#e0d7ec','#9271d5','#c29bea','#eee8f7','#8060c8']
+  };
+
+  const values = palettes[theme] || palettes.aurora;
+  keys.forEach((key, i) => document.documentElement.style.setProperty(key, values[i]));
+  document.body.dataset.theme = theme;
+}
+
+function buildThemeOptions() {
+  const list = $('.theme-list');
+  if (!list) return;
+
+  list.innerHTML = Object.entries(themeConfig).map(([id, t]) => `
+    <button class="theme-option" type="button" data-theme-choice="${id}">
+      <span class="swatch ${id}"></span>
+      <span>
+        <b>${t.label}</b>
+        <small>${t.description}</small>
+      </span>
+      <i>✓</i>
+    </button>
+  `).join('');
+
+  list.querySelectorAll('[data-theme-choice]').forEach(button => {
+    const id = button.dataset.themeChoice;
+
+    button.addEventListener('pointerenter', () => {
+      applyThemeColors(id);
+      document.body.classList.add('theme-preview');
+    });
+
+    button.addEventListener('pointerleave', () => {
+      document.body.classList.remove('theme-preview');
+      applyThemeColors(currentTheme);
+    });
+
+    button.addEventListener('focus', () => {
+      applyThemeColors(id);
+      document.body.classList.add('theme-preview');
+    });
+
+    button.addEventListener('blur', () => {
+      document.body.classList.remove('theme-preview');
+      applyThemeColors(currentTheme);
+    });
+
+    button.addEventListener('click', () => setTheme(id));
+  });
+}
+
+function setTheme(theme) {
+  if (!themeConfig[theme]) theme = 'aurora';
+
+  currentTheme = theme;
+  applyThemeColors(theme);
+
+  localStorage.setItem('chatflow_theme', theme);
+
+  $$('.theme-option').forEach(button => {
+    button.classList.toggle(
+      'selected',
+      button.dataset.themeChoice === theme
+    );
+  });
+
+  if (messages.length) {
+    renderOverview();
+    renderStats();
+  }
+
+  haptic();
+}
+
+function setupDynamicHeader() {
+  const scroller = $('#chatMessages');
+  const header = $('.topbar');
+
+  if (!scroller || !header) return;
+
+  let ticking = false;
+
+  scroller.addEventListener('scroll', () => {
+    if (ticking) return;
+
+    ticking = true;
+
+    requestAnimationFrame(() => {
+      const collapsed = scroller.scrollTop > 45;
+
+      header.classList.toggle('is-collapsed', collapsed);
+      document.body.classList.toggle('header-collapsed', collapsed);
+
+      ticking = false;
+    });
+  }, { passive: true });
+}
+
+buildThemeOptions();
+
+$$('[data-theme-choice]').forEach(button => {
+  button.addEventListener('click', () => setTheme(button.dataset.themeChoice));
+});
+
+$('#themeQuick').onclick = () => {
+  const index = themes.indexOf(currentTheme);
+  setTheme(themes[(index + 1) % themes.length]);
+};
+
+currentTheme = localStorage.getItem('chatflow_theme') || 'aurora';
+setTheme(currentTheme);
+
+setupDynamicHeader();
 
 restoreChat();
