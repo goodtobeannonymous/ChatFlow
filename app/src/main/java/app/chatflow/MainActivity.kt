@@ -2,19 +2,26 @@ package app.chatflow
 
 import android.app.Activity
 import android.os.Bundle
+import android.os.Build
+import android.content.Intent
+import android.net.Uri
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.view.View
+import android.webkit.ValueCallback
+import android.view.WindowInsets
 import android.view.WindowManager
 import android.graphics.Color
 
 class MainActivity : Activity() {
     private lateinit var web: WebView
+    private var filePathCallback: ValueCallback<Array<Uri>>? = null
+    private val filePickerRequest = 1001
 
     @Suppress("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         window.statusBarColor = Color.rgb(10, 12, 18)
         window.navigationBarColor = Color.rgb(10, 12, 18)
         window.decorView.systemUiVisibility = 0
@@ -27,10 +34,57 @@ class MainActivity : Activity() {
         web.settings.allowFileAccess = true
         web.settings.allowContentAccess = true
         web.settings.setSupportZoom(false)
-        web.webChromeClient = WebChromeClient()
+
+        // Keep the app content below the status bar and above the system navigation area.
+        web.setOnApplyWindowInsetsListener { view, insets ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val bars = insets.getInsets(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+                view.setPadding(0, bars.top, 0, bars.bottom)
+            } else {
+                @Suppress("DEPRECATION")
+                view.setPadding(0, insets.systemWindowInsetTop, 0, insets.systemWindowInsetBottom)
+            }
+            insets
+        }
+
+        web.webChromeClient = object : WebChromeClient() {
+            override fun onShowFileChooser(
+                webView: WebView?,
+                filePathCallback: ValueCallback<Array<Uri>>?,
+                fileChooserParams: FileChooserParams?
+            ): Boolean {
+                this@MainActivity.filePathCallback?.onReceiveValue(null)
+                this@MainActivity.filePathCallback = filePathCallback
+
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("text/plain", "application/octet-stream"))
+                }
+                return try {
+                    startActivityForResult(Intent.createChooser(intent, "Select chat export"), filePickerRequest)
+                    true
+                } catch (e: Exception) {
+                    this@MainActivity.filePathCallback?.onReceiveValue(null)
+                    this@MainActivity.filePathCallback = null
+                    false
+                }
+            }
+        }
         web.webViewClient = WebViewClient()
         setContentView(web)
+        web.requestApplyInsets()
         web.loadUrl("file:///android_asset/index.html")
+    }
+
+    @Deprecated("Deprecated in Android")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == filePickerRequest) {
+            val result = if (resultCode == RESULT_OK && data?.data != null) arrayOf(data.data!!) else null
+            filePathCallback?.onReceiveValue(result)
+            filePathCallback = null
+        }
     }
 
     @Deprecated("Deprecated in Android")
