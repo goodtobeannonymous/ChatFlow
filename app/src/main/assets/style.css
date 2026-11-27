@@ -54,3 +54,59 @@
   .topbar{padding-left:15px;padding-right:15px}
   .panel{padding:13px}
 }
+
+
+/* ChatFlow polish v1.2 â€” Android safe areas, WhatsApp-style bubbles and legible charts. */
+.topbar{
+  min-height:82px;
+  height:auto;
+  padding:12px 18px;
+  align-items:center;
+}
+.app-shell{padding-bottom:112px}
+.bottom-nav{
+  bottom:10px;
+  height:82px;
+  padding:8px 12px;
+  border:1px solid color-mix(in srgb,var(--accent) 28%,var(--line));
+  border-radius:22px;
+  box-shadow:0 -8px 30px #0003,0 10px 30px #0003;
+}
+.nav-item{color:color-mix(in srgb,var(--text) 78%,var(--muted));}
+.nav-item small{font-size:10px;font-weight:650;color:inherit}
+.nav-item.active{color:var(--text);background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 30%,var(--surface)),color-mix(in srgb,var(--accent2) 17%,var(--surface)))}
+.messages{
+  height:calc(100dvh - 270px);
+  min-height:300px;
+  padding-bottom:28px;
+}
+.msg-row{max-width:86%;gap:0}
+.bubble{
+  display:block;
+  padding:10px 12px 7px;
+  border-radius:17px 17px 17px 5px;
+}
+.mine .bubble{border-radius:17px 17px 5px 17px}
+.message-text{white-space:pre-wrap;overflow-wrap:anywhere}
+.bubble-time{
+  display:block;
+  text-align:right;
+  font-size:9px;
+  line-height:1.2;
+  color:color-mix(in srgb,var(--text) 66%,transparent);
+  margin:4px 1px 0 18px;
+  white-space:nowrap;
+}
+.day-separator{position:sticky;top:5px;z-index:2;margin:14px 0}
+.day-separator span{
+  display:inline-block;
+  padding:6px 12px;
+  border:1px solid color-mix(in srgb,var(--accent) 14%,var(--line));
+  box-shadow:0 3px 12px #0002;
+}
+.panel canvas{height:230px}
+@media(max-width:380px){
+  .topbar{padding-left:14px;padding-right:14px}
+  .bottom-nav{bottom:8px;height:78px}
+  .messages{height:calc(100dvh - 250px)}
+}
