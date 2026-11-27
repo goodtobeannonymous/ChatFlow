@@ -112,86 +112,31 @@
 }
 
 
-/* Header fix: Android Activity already fits the system bars.
-   Keep the web header compact; do not add a second status-bar offset. */
-.topbar {
-  box-sizing: border-box;
-  height: 76px;
-  min-height: 76px;
-  padding: 0 20px;
-  margin-top: 0;
-  position: sticky;
-  top: 0;
-  align-items: center;
-}
-.topbar .brand-copy {
-  min-width: 0;
-}
-.topbar .brand,
-.topbar .tagline {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.app-shell {
-  padding-top: 0;
-}
-@media (max-width: 380px) {
-  .topbar {
-    height: 72px;
-    min-height: 72px;
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-}
-
-
-/* ChatFlow dynamic reader header: expands at the top and compacts while reading. */
-.reader-head{
-  position:relative;
-  z-index:4;
-  min-height:58px;
-  padding:9px 10px;
-  margin:0 0 12px;
-  border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line));
-  border-radius:18px;
-  background:color-mix(in srgb,var(--surface) 94%,transparent);
-  box-shadow:0 8px 22px #00000012;
-  transform-origin:top center;
-  transition:min-height .22s ease,padding .22s ease,margin .22s ease,
-             border-radius .22s ease,box-shadow .22s ease,background .22s ease;
-}
-.reader-head .avatar-stack span{
-  width:36px;
-  height:36px;
-  transition:width .22s ease,height .22s ease,font-size .22s ease;
-}
-.reader-head .reader-title strong{
-  font-size:14px;
-  transition:font-size .22s ease;
-}
-.reader-head .reader-title small{
-  transition:opacity .18s ease,max-height .22s ease,margin .22s ease;
-  max-height:20px;
-  overflow:hidden;
-}
-.reader-head.is-collapsed{
-  min-height:44px;
-  padding:5px 9px;
-  margin-bottom:7px;
-  border-radius:14px;
-  box-shadow:0 5px 16px #0000000d;
-}
-.reader-head.is-collapsed .avatar-stack span{
-  width:29px;
-  height:29px;
-  font-size:10px;
-}
-.reader-head.is-collapsed .reader-title strong{font-size:12px}
-.reader-head.is-collapsed .reader-title small{
-  opacity:0;
-  max-height:0;
-  margin-top:0;
-}
-@media(prefers-reduced-motion:reduce){
-  .reader-head,.reader-head *{transition:none!important}
-}
+/* ChatFlow final theme system + live preview + adaptive header */
+body{transition:background-color .34s ease,color .34s ease}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(ellipse at 12% 0%,color-mix(in srgb,var(--accent) 12%,transparent),transparent 48%);transition:opacity .35s ease}
+.topbar{height:76px;min-height:76px;transition:height .24s ease,min-height .24s ease,padding .24s ease,box-shadow .24s ease,background-color .24s ease}
+.topbar.is-collapsed{height:58px;min-height:58px;padding-top:0;padding-bottom:0;box-shadow:0 8px 24px #0002}
+.topbar.is-collapsed .brand-mark{width:32px;height:32px;border-radius:11px;font-size:18px}
+.topbar.is-collapsed .tagline{opacity:0;max-height:0;margin:0;overflow:hidden}
+.theme-picker-panel{margin-top:18px}
+.theme-picker-hint{font-size:11px;color:var(--muted);margin:-7px 0 14px}
+.theme-picker-grid{display:grid;grid-template-columns:1fr;gap:9px}
+.theme-picker-grid .theme-option{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:10px;border-radius:16px;border:1px solid var(--line);background:var(--surface2);color:var(--text);cursor:pointer;transition:border-color .22s,background .22s,transform .22s,box-shadow .22s}
+.theme-picker-grid .theme-option.selected{border-color:var(--accent);box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 35%,transparent),0 8px 22px #0002}
+.theme-picker-grid .theme-option:active{transform:scale(.985)}
+.theme-option-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}.theme-option-copy b{font-size:12px}.theme-option-copy small{font-size:10px;color:var(--muted)}
+.theme-picker-grid .theme-option i{font-style:normal;opacity:0;color:var(--accent);font-weight:900}.theme-picker-grid .theme-option.selected i{opacity:1}
+.swatch{width:46px;height:46px;border-radius:14px;flex-shrink:0}
+.swatch.aurora{background:linear-gradient(135deg,#39205f,#b66ce8,#f3a1da)}
+.swatch.midnight-amoled{background:linear-gradient(135deg,#000,#080d1a 55%,#087cff)}
+.swatch.ocean-glass{background:linear-gradient(135deg,#063b53,#16b9c7,#a4f0e9)}
+.swatch.sunset{background:linear-gradient(135deg,#642d55,#f07862,#ffc477)}
+.swatch.lavender{background:linear-gradient(135deg,#35265f,#9b8be8,#e3c9ff)}
+body[data-theme="aurora"]{--bg:#0d0b18;--surface:#171326;--surface2:#211b35;--text:#f7f4ff;--muted:#aaa1c2;--line:#302844;--accent:#a78bfa;--accent2:#ec8df5;--bubbleA:#29213f;--bubbleB:#6843a7;--shadow:0 18px 50px #0003}
+body[data-theme="midnight-amoled"]{--bg:#000;--surface:#080a0f;--surface2:#11151e;--text:#f5f7fb;--muted:#929baa;--line:#202633;--accent:#168bff;--accent2:#6ac8ff;--bubbleA:#171b24;--bubbleB:#075bb8;--shadow:0 18px 50px #0008}
+body[data-theme="ocean-glass"]{--bg:#071923;--surface:#0e2937;--surface2:#153a49;--text:#e9fbff;--muted:#9dbec8;--line:#245363;--accent:#42d6df;--accent2:#80f0d4;--bubbleA:#173b4a;--bubbleB:#087e91;--shadow:0 18px 50px #001a2480}
+body[data-theme="sunset"]{--bg:#21131d;--surface:#33202d;--surface2:#482b38;--text:#fff4ed;--muted:#d4aaa0;--line:#5c3943;--accent:#ff9278;--accent2:#ffc477;--bubbleA:#4b303b;--bubbleB:#b85262;--shadow:0 18px 50px #16070c66}
+body[data-theme="lavender"]{--bg:#171326;--surface:#241d38;--surface2:#302747;--text:#f7f1ff;--muted:#b9acd2;--line:#45385e;--accent:#b7a0ff;--accent2:#e0b8ff;--bubbleA:#382d50;--bubbleB:#7659b6;--shadow:0 18px 50px #09051366}
+body[data-theme="ocean-glass"] .topbar,body[data-theme="ocean-glass"] .bottom-nav{backdrop-filter:blur(22px) saturate(150%)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
