@@ -34,7 +34,7 @@ function haptic(){try{if(navigator.vibrate)navigator.vibrate(8)}catch(e){}}
 function showStatus(s){$('#importStatus').textContent=s}
 $('#chatFile').addEventListener('change',async e=>{
  const file=e.target.files[0];if(!file)return;
- showStatus('Reading '+file.name+'â€¦');
+ showStatus('Reading '+file.name+'Ã¢â‚¬Â¦');
  try{
   const text=await file.text(); messages=parseChat(text);
   const counts=new Map();messages.forEach(m=>counts.set(m.name,(counts.get(m.name)||0)+1));
@@ -52,7 +52,7 @@ $('#chatFile').addEventListener('change',async e=>{
   if(!messages.length)throw new Error('No supported timestamped messages were found.');
   await saveChatText(text);
   localStorage.setItem('chatflow_theme',currentTheme);
-  showStatus(`${messages.length.toLocaleString()} messages imported Â· ${people.length} participants`);
+  showStatus(`${messages.length.toLocaleString()} messages imported Ã‚Â· ${people.length} participants`);
   $('#overview').classList.remove('hidden'); renderOverview();renderStats();renderReader(true);
   $('#chatTitle').textContent=people.slice(0,2).join(' & ');
   $('#chatSubtitle').textContent=`${messages.length.toLocaleString()} messages`;
@@ -68,7 +68,7 @@ function renderOverview(){
  $('#totalMessages').textContent=messages.length.toLocaleString();$('#participantCount').textContent=people.length;
  const c=countBy(m=>m.person);const vals=people.map(p=>c[p]||0),total=messages.length;
  $('#distribution').innerHTML=people.slice(0,2).map((p,i)=>`<span style="width:${(vals[i]/total*100).toFixed(2)}%;background:${i?'var(--accent2)':'var(--accent)'}"></span>`).join('');
- $('#peopleLegend').innerHTML=people.slice(0,2).map((p,i)=>`<span>â— ${safe(p)} <b>${((vals[i]/total)*100).toFixed(1)}%</b></span>`).join('');
+ $('#peopleLegend').innerHTML=people.slice(0,2).map((p,i)=>`<span>Ã¢â€”Â ${safe(p)} <b>${((vals[i]/total)*100).toFixed(1)}%</b></span>`).join('');
  drawChart($('#activityChart'),Object.entries(countBy(m=>m.date.toISOString().slice(0,10))).slice(-14).map(([k,v])=>[k.slice(5),v]));
 }
 function renderStats(){
@@ -81,14 +81,50 @@ function renderStats(){
  const hours=countBy(m=>String(m.date.getHours()).padStart(2,'0'));
  drawChart($('#hoursChart'),Array.from({length:24},(_,h)=>[String(h).padStart(2,'0'),hours[String(h).padStart(2,'0')]||0]));
  const months=countBy(m=>m.date.getFullYear()+'-'+String(m.date.getMonth()+1).padStart(2,'0'));
- drawChart($('#monthChart'),Object.entries(months).slice(-12).map(([k,v])=>[k.slice(2),v]));
+ drawChart($('#monthChart'),Object.entries(months).slice(-12).map(([k,v])=>{const [y,m]=k.split('-').map(Number);return [new Date(y,m-1,1).toLocaleDateString(undefined,{month:'short',year:'2-digit'}),v]}),true);
 }
-function drawChart(canvas,data){
- if(!canvas)return;const ctx=canvas.getContext('2d'),w=canvas.clientWidth||300,h=canvas.height;canvas.width=w*devicePixelRatio;canvas.height=h*devicePixelRatio;ctx.scale(devicePixelRatio,devicePixelRatio);
- const max=Math.max(1,...data.map(x=>x[1])),pad=24,step=(w-pad*2)/Math.max(data.length,1);
- ctx.clearRect(0,0,w,h);ctx.strokeStyle=getComputedStyle(document.body).getPropertyValue('--line');ctx.lineWidth=1;
- for(let i=0;i<4;i++){let y=12+(h-38)*i/3;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(w-8,y);ctx.stroke()}
- data.forEach((d,i)=>{let bh=(h-50)*d[1]/max,x=pad+i*step+step*.22,y=h-25-bh;ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--accent');let r=5;ctx.beginPath();ctx.roundRect(x,y,Math.max(3,step*.55),bh,[r,r,2,2]);ctx.fill();if(data.length<=14||i%3===0){ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--muted');ctx.font='9px sans-serif';ctx.textAlign='center';ctx.fillText(d[0],x+step*.275,h-8)}})
+function drawChart(canvas,data,verticalLabels=false){
+  if(!canvas)return;
+  const dpr=window.devicePixelRatio||1;
+  const w=Math.max(260,canvas.clientWidth||300);
+  const cssH=verticalLabels?260:230;
+  canvas.style.height=cssH+'px';
+  canvas.width=Math.round(w*dpr);
+  canvas.height=Math.round(cssH*dpr);
+  const ctx=canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const h=cssH, max=Math.max(1,...data.map(x=>x[1]));
+  const padL=24,padR=8,top=12,bottom=verticalLabels?76:30;
+  const plotH=h-top-bottom,plotW=w-padL-padR;
+  const step=plotW/Math.max(data.length,1),style=getComputedStyle(document.body);
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle=style.getPropertyValue('--line').trim()||'#302844';
+  ctx.lineWidth=1;
+  for(let i=0;i<4;i++){
+    const y=top+plotH*i/3;
+    ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(w-padR,y);ctx.stroke();
+  }
+  data.forEach((d,i)=>{
+    const bh=plotH*d[1]/max,x=padL+i*step+step*.22,y=top+plotH-bh;
+    ctx.fillStyle=style.getPropertyValue('--accent').trim()||'#a78bfa';
+    ctx.beginPath();ctx.roundRect(x,y,Math.max(3,step*.56),bh,[5,5,2,2]);ctx.fill();
+    const showLabel=verticalLabels||data.length<=14||i%3===0;
+    if(showLabel){
+      ctx.save();
+      ctx.fillStyle=style.getPropertyValue('--muted').trim()||'#aaa1c2';
+      ctx.font='10px system-ui,sans-serif';
+      if(verticalLabels){
+        ctx.translate(padL+i*step+step*.5,h-8);
+        ctx.rotate(-Math.PI/2);
+        ctx.textAlign='right';
+        ctx.fillText(String(d[0]),0,0);
+      }else{
+        ctx.textAlign='center';
+        ctx.fillText(String(d[0]),padL+i*step+step*.5,h-9);
+      }
+      ctx.restore();
+    }
+  });
 }
 function appendReaderPage(){
   const list=filtered||messages;
@@ -99,7 +135,7 @@ function appendReaderPage(){
     const m=list[i],day=fmtDate(m.date);
     if(day!==lastDay){html+=`<div class="day-separator"><span>${safe(day)}</span></div>`;lastDay=day}
     const mine=m.person===people[0],prev=list[i-1];
-    html+=`<div class="msg-row ${mine?'mine':'theirs'}">${(!prev||prev.person!==m.person)?`<div class="sender">${safe(m.person)}</div>`:''}<div class="bubble">${safe(m.text||' ')}</div><div class="time">${fmtTime(m.date)}</div></div>`;
+    html+=`<div class="msg-row ${mine?'mine':'theirs'}">${(!prev||prev.person!==m.person)?`<div class="sender">${safe(m.person)}</div>`:''}<div class="bubble"><span class="message-text">${safe(m.text||' ')}</span><span class="bubble-time">${fmtTime(m.date)}</span></div></div>`;
   }
   $('#chatMessages').insertAdjacentHTML('beforeend',html);
   visibleStart=to;
