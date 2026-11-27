@@ -6,7 +6,6 @@ function normalizeName(s){return s.replace(/\s*\([^)]*\)\s*/g,' ').replace(/\s+/
 function parseDate(d,t){
   const [a,b,c]=d.split('/').map(Number); let year=c<100?2000+c:c;
   let month=a,day=b;
-  // WhatsApp exports commonly use M/D/YY; detect obviously day-first dates.
   if(a>12){day=a;month=b}
   const tm=t.trim().match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i);
   if(!tm)return new Date(year,month-1,day);
@@ -34,17 +33,15 @@ function haptic(){try{if(navigator.vibrate)navigator.vibrate(8)}catch(e){}}
 function showStatus(s){$('#importStatus').textContent=s}
 $('#chatFile').addEventListener('change',async e=>{
  const file=e.target.files[0];if(!file)return;
- showStatus('Reading '+file.name+'Ã¢â‚¬Â¦');
+ showStatus('Reading '+file.name+'…');
  try{
   const text=await file.text(); messages=parseChat(text);
   const counts=new Map();messages.forEach(m=>counts.set(m.name,(counts.get(m.name)||0)+1));
-  // Merge source variants into the two main people; keep any additional senders separate.
   people=[...new Set(messages.map(m=>m.name))].sort((a,b)=>(counts.get(b)-counts.get(a)));
   if(people.length>2){
     const bases=[...new Set(people.map(normalizeName))];
     people=bases.sort((a,b)=>messages.filter(m=>m.name===a||normalizeName(m.name)===a).length-messages.filter(m=>m.name===b||normalizeName(m.name)===b).length).reverse();
   }
-  // For exports with suffixes such as (wp1), sender labels are normalized to person names.
   messages.forEach(m=>m.person=normalizeName(m.name));
   const ranked=[...new Set(messages.map(m=>m.person))].sort((a,b)=>messages.filter(x=>x.person===b).length-messages.filter(x=>x.person===a).length);
   people=ranked.slice(0,2);
@@ -52,7 +49,7 @@ $('#chatFile').addEventListener('change',async e=>{
   if(!messages.length)throw new Error('No supported timestamped messages were found.');
   await saveChatText(text);
   localStorage.setItem('chatflow_theme',currentTheme);
-  showStatus(`${messages.length.toLocaleString()} messages imported Ã‚Â· ${people.length} participants`);
+  showStatus(`${messages.length.toLocaleString()} messages imported · ${people.length} participants`);
   $('#overview').classList.remove('hidden'); renderOverview();renderStats();renderReader(true);
   $('#chatTitle').textContent=people.slice(0,2).join(' & ');
   $('#chatSubtitle').textContent=`${messages.length.toLocaleString()} messages`;
@@ -68,7 +65,7 @@ function renderOverview(){
  $('#totalMessages').textContent=messages.length.toLocaleString();$('#participantCount').textContent=people.length;
  const c=countBy(m=>m.person);const vals=people.map(p=>c[p]||0),total=messages.length;
  $('#distribution').innerHTML=people.slice(0,2).map((p,i)=>`<span style="width:${(vals[i]/total*100).toFixed(2)}%;background:${i?'var(--accent2)':'var(--accent)'}"></span>`).join('');
- $('#peopleLegend').innerHTML=people.slice(0,2).map((p,i)=>`<span>Ã¢â€”Â ${safe(p)} <b>${((vals[i]/total)*100).toFixed(1)}%</b></span>`).join('');
+ $('#peopleLegend').innerHTML=people.slice(0,2).map((p,i)=>`<span>● ${safe(p)} <b>${((vals[i]/total)*100).toFixed(1)}%</b></span>`).join('');
  drawChart($('#activityChart'),Object.entries(countBy(m=>m.date.toISOString().slice(0,10))).slice(-14).map(([k,v])=>[k.slice(5),v]));
 }
 function renderStats(){
