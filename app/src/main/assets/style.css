@@ -110,3 +110,88 @@
   .bottom-nav{bottom:8px;height:78px}
   .messages{height:calc(100dvh - 250px)}
 }
+
+
+/* Header fix: Android Activity already fits the system bars.
+   Keep the web header compact; do not add a second status-bar offset. */
+.topbar {
+  box-sizing: border-box;
+  height: 76px;
+  min-height: 76px;
+  padding: 0 20px;
+  margin-top: 0;
+  position: sticky;
+  top: 0;
+  align-items: center;
+}
+.topbar .brand-copy {
+  min-width: 0;
+}
+.topbar .brand,
+.topbar .tagline {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.app-shell {
+  padding-top: 0;
+}
+@media (max-width: 380px) {
+  .topbar {
+    height: 72px;
+    min-height: 72px;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+
+/* ChatFlow dynamic reader header: expands at the top and compacts while reading. */
+.reader-head{
+  position:relative;
+  z-index:4;
+  min-height:58px;
+  padding:9px 10px;
+  margin:0 0 12px;
+  border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line));
+  border-radius:18px;
+  background:color-mix(in srgb,var(--surface) 94%,transparent);
+  box-shadow:0 8px 22px #00000012;
+  transform-origin:top center;
+  transition:min-height .22s ease,padding .22s ease,margin .22s ease,
+             border-radius .22s ease,box-shadow .22s ease,background .22s ease;
+}
+.reader-head .avatar-stack span{
+  width:36px;
+  height:36px;
+  transition:width .22s ease,height .22s ease,font-size .22s ease;
+}
+.reader-head .reader-title strong{
+  font-size:14px;
+  transition:font-size .22s ease;
+}
+.reader-head .reader-title small{
+  transition:opacity .18s ease,max-height .22s ease,margin .22s ease;
+  max-height:20px;
+  overflow:hidden;
+}
+.reader-head.is-collapsed{
+  min-height:44px;
+  padding:5px 9px;
+  margin-bottom:7px;
+  border-radius:14px;
+  box-shadow:0 5px 16px #0000000d;
+}
+.reader-head.is-collapsed .avatar-stack span{
+  width:29px;
+  height:29px;
+  font-size:10px;
+}
+.reader-head.is-collapsed .reader-title strong{font-size:12px}
+.reader-head.is-collapsed .reader-title small{
+  opacity:0;
+  max-height:0;
+  margin-top:0;
+}
+@media(prefers-reduced-motion:reduce){
+  .reader-head,.reader-head *{transition:none!important}
+}
