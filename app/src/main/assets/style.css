@@ -140,3 +140,187 @@ body[data-theme="sunset"]{--bg:#21131d;--surface:#33202d;--surface2:#482b38;--te
 body[data-theme="lavender"]{--bg:#171326;--surface:#241d38;--surface2:#302747;--text:#f7f1ff;--muted:#b9acd2;--line:#45385e;--accent:#b7a0ff;--accent2:#e0b8ff;--bubbleA:#382d50;--bubbleB:#7659b6;--shadow:0 18px 50px #09051366}
 body[data-theme="ocean-glass"] .topbar,body[data-theme="ocean-glass"] .bottom-nav{backdrop-filter:blur(22px) saturate(150%)}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* =====================================
+   CHATFLOW 2.0 - PREMIUM THEMES
+===================================== */
+
+:root {
+  --bg: #0d0b18;
+  --surface: #171326;
+  --surface2: #211b35;
+  --text: #f7f4ff;
+  --muted: #aaa1c2;
+  --line: #302844;
+  --accent: #a78bfa;
+  --accent2: #ec8df5;
+  --bubbleA: #29213f;
+  --bubbleB: #6843a7;
+}
+
+/* Remove old themes */
+body[data-theme="forest"],
+body[data-theme="pearl"] {
+  color: var(--text);
+}
+
+/* Theme swatches */
+.swatch.aurora {
+  background: linear-gradient(135deg,#39205f,#b66ce8,#f3a1da);
+}
+
+.swatch.amoled {
+  background: linear-gradient(135deg,#000,#111,#087cff);
+}
+
+.swatch.ocean {
+  background: linear-gradient(135deg,#071522,#087da9,#65d9ef);
+}
+
+.swatch.sunset {
+  background: linear-gradient(135deg,#49202c,#ff765f,#ffc36e);
+}
+
+.swatch.lavender {
+  background: linear-gradient(135deg,#e6d8ff,#9271d5,#c29bea);
+}
+
+/* Smooth theme transitions */
+body,
+body * {
+  transition:
+    background-color .28s ease,
+    border-color .28s ease,
+    color .22s ease,
+    box-shadow .28s ease;
+}
+
+.theme-preview .theme-option {
+  transform: translateY(-2px);
+}
+
+/* =====================================
+   DYNAMIC COLLAPSING HEADER
+===================================== */
+
+.topbar {
+  height: 82px;
+  min-height: 82px;
+  padding: 10px 18px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  overflow: hidden;
+  transform-origin: top;
+  transition:
+    height .28s ease,
+    min-height .28s ease,
+    padding .28s ease,
+    background .28s ease,
+    box-shadow .28s ease;
+  will-change: height;
+}
+
+.topbar.is-collapsed {
+  height: 58px;
+  min-height: 58px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background: color-mix(in srgb,var(--bg) 96%,transparent);
+  box-shadow: 0 5px 22px #0003;
+}
+
+.topbar .brand-mark {
+  transition:
+    width .28s ease,
+    height .28s ease,
+    border-radius .28s ease;
+}
+
+.topbar.is-collapsed .brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 11px;
+  font-size: 18px;
+}
+
+.topbar .tagline {
+  opacity: 1;
+  max-height: 25px;
+  transition: opacity .2s ease, max-height .25s ease;
+}
+
+.topbar.is-collapsed .tagline {
+  opacity: 0;
+  max-height: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Keep title readable */
+.topbar .brand {
+  white-space: nowrap;
+  font-size: 18px;
+}
+
+/* =====================================
+   CHART COLOR POLISH
+===================================== */
+
+.panel canvas {
+  transition: opacity .25s ease;
+}
+
+.distribution span {
+  transition: width .35s ease, background .3s ease;
+}
+
+.theme-option {
+  transition:
+    transform .2s ease,
+    border-color .25s ease,
+    background .25s ease;
+}
+
+.theme-option.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 18px color-mix(in srgb,var(--accent) 15%,transparent);
+}
+
+/* Smooth screen and bubble transitions */
+.screen.active {
+  animation: chatFlowEnter .28s ease both;
+}
+
+@keyframes chatFlowEnter {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .topbar {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .topbar.is-collapsed {
+    height: 56px;
+    min-height: 56px;
+  }
+}
