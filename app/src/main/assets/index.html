@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a0c12">
+<title>ChatFlow</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="aurora">
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand-mark">✦</div>
+    <div class="brand-copy"><div class="brand">ChatFlow</div><div class="tagline">Your conversations, reimagined</div></div>
+    <button class="icon-btn" id="themeQuick" aria-label="Change theme">◐</button>
+  </header>
+
+  <main>
+    <section id="home" class="screen active">
+      <div class="hero">
+        <div class="eyebrow">CONVERSATION SPACE</div>
+        <h1>Every message<br><span>has a story.</span></h1>
+        <p>Bring your conversations to life. Private, beautiful, and all yours.</p>
+        <label class="import-card" for="chatFile">
+          <span class="upload-icon">↑</span>
+          <span class="import-title">Import chat file</span>
+          <span class="import-sub">Choose a WhatsApp-style .txt export</span>
+          <span class="import-action">Choose file <b>→</b></span>
+        </label>
+        <input id="chatFile" type="file" accept=".txt,text/plain">
+        <div id="importStatus" class="status">Your file stays on this device.</div>
+      </div>
+
+      <div id="overview" class="hidden">
+        <div class="section-head"><div><div class="eyebrow">YOUR ARCHIVE</div><h2>Conversation overview</h2></div><span class="live-dot"></span></div>
+        <div class="stat-grid">
+          <article class="stat-card"><span>Total messages</span><strong id="totalMessages">0</strong><small>Across this conversation</small></article>
+          <article class="stat-card"><span>Participants</span><strong id="participantCount">0</strong><small>People identified</small></article>
+        </div>
+        <div class="panel"><div class="panel-title">Message distribution</div><div id="distribution" class="distribution"></div><div id="peopleLegend" class="legend"></div></div>
+        <div class="panel"><div class="panel-title">Activity over time</div><canvas id="activityChart" height="150"></canvas></div>
+        <button class="primary-btn full" id="openReader">Open conversation <span>→</span></button>
+      </div>
+    </section>
+
+    <section id="reader" class="screen">
+      <div class="reader-head">
+        <button class="back-btn" data-go="home">‹</button>
+        <div class="avatar-stack"><span id="avatarA">Z</span><span id="avatarB">M</span></div>
+        <div class="reader-title"><strong id="chatTitle">Conversation</strong><small id="chatSubtitle">Your private archive</small></div>
+        <button class="icon-btn" id="searchToggle">⌕</button>
+      </div>
+      <div id="searchBar" class="search-bar hidden"><input id="searchInput" placeholder="Search messages…"><button id="clearSearch">×</button></div>
+      <div id="chatMessages" class="messages">
+        <div class="empty-state">Import a chat file to begin.</div>
+      </div>
+      <div class="reader-tools"><span id="messageCountLabel">No messages loaded</span><button id="loadOlder" class="text-btn">Load earlier messages ↑</button></div>
+    </section>
+
+    <section id="stats" class="screen">
+      <div class="page-heading"><div class="eyebrow">THE BIG PICTURE</div><h1>Chat insights</h1><p>Patterns and moments from your conversation.</p></div>
+      <div class="stat-grid">
+        <article class="stat-card"><span>Total messages</span><strong id="statTotal">0</strong></article>
+        <article class="stat-card"><span>Active days</span><strong id="activeDays">0</strong></article>
+        <article class="stat-card"><span>First message</span><strong id="firstDate">—</strong></article>
+        <article class="stat-card"><span>Last message</span><strong id="lastDate">—</strong></article>
+      </div>
+      <div class="panel"><div class="panel-title">Who sends more?</div><div id="senderBars"></div></div>
+      <div class="panel"><div class="panel-title">Most active hours</div><canvas id="hoursChart" height="170"></canvas></div>
+      <div class="panel"><div class="panel-title">Monthly activity</div><canvas id="monthChart" height="170"></canvas></div>
+    </section>
+
+    <section id="appearance" class="screen">
+      <div class="page-heading"><div class="eyebrow">MAKE IT YOURS</div><h1>Appearance</h1><p>A little atmosphere changes everything.</p></div>
+      <div class="theme-list">
+        <button class="theme-option" data-theme-choice="aurora"><span class="swatch aurora"></span><span><b>Aurora</b><small>Violet skies & luminous gradients</small></span><i>✓</i></button>
+        <button class="theme-option" data-theme-choice="forest"><span class="swatch forest"></span><span><b>Forest</b><small>Calm greens & natural tones</small></span><i>✓</i></button>
+        <button class="theme-option" data-theme-choice="amoled"><span class="swatch amoled"></span><span><b>AMOLED</b><small>Pure black & electric blue</small></span><i>✓</i></button>
+        <button class="theme-option" data-theme-choice="pearl"><span class="swatch pearl"></span><span><b>Pearl</b><small>Soft light & quiet clarity</small></span><i>✓</i></button>
+      </div>
+      <div class="panel privacy-panel"><span class="privacy-icon">⌑</span><div><b>Private by design</b><p>ChatFlow processes imported text locally. Your conversation is not sent to a server.</p></div></div>
+      <div class="version">CHATFLOW · VERSION 1.0</div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-go="home"><span>⌂</span><small>Home</small></button>
+    <button class="nav-item" data-go="reader"><span>▤</span><small>Chats</small></button>
+    <button class="nav-item" data-go="stats"><span>◫</span><small>Insights</small></button>
+    <button class="nav-item" data-go="appearance"><span>◉</span><small>Themes</small></button>
+  </nav>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
