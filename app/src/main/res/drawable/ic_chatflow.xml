@@ -1,35 +1,12 @@
-
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp"
-    android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-
-    <!-- Midnight background -->
-    <path
-        android:fillColor="#101326"
-        android:pathData="M0,0 H108 V108 H0 Z"/>
-
-    <!-- Violet conversation wave -->
-    <path
-        android:fillColor="@android:color/transparent"
-        android:strokeColor="#A78BFA"
-        android:strokeWidth="9"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M72,31 C63,21 43,22 32,34 C19,48 23,68 38,77 C48,83 60,82 68,75"/>
-
-    <!-- Cyan conversation wave -->
-    <path
-        android:fillColor="@android:color/transparent"
-        android:strokeColor="#43D8ED"
-        android:strokeWidth="9"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M36,77 C45,87 65,87 76,74 C88,61 85,42 70,32 C60,25 49,27 41,34"/>
-
-    <!-- Conversation dots -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M43,53 A3,3 0,1 0 49,53 A3,3 0,1 0 43,53 M55,53 A3,3 0,1 0 61,53 A3,3 0,1 0 55,53 M67,53 A3,3 0,1 0 73,53 A3,3 0,1 0 67,53"/>
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#101326" android:pathData="M0,0h108v108h-108z"/>
+    <path android:fillColor="#00000000" android:strokeColor="#A78BFA"
+        android:strokeWidth="8" android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:pathData="M70,29 C57,19 39,24 31,38 C22,53 28,72 43,78 C53,82 63,78 69,71"/>
+    <path android:fillColor="#00000000" android:strokeColor="#43D8ED"
+        android:strokeWidth="8" android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:pathData="M38,78 C51,88 69,83 77,69 C86,54 80,36 65,30 C55,26 45,30 39,37"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M43,53a3,3 0,1 0,6 0a3,3 0,1 0,-6 0 M55,53a3,3 0,1 0,6 0a3,3 0,1 0,-6 0 M67,53a3,3 0,1 0,6 0a3,3 0,1 0,-6 0"/>
 </vector>
