@@ -34,7 +34,7 @@ function haptic(){try{if(navigator.vibrate)navigator.vibrate(8)}catch(e){}}
 function showStatus(s){$('#importStatus').textContent=s}
 $('#chatFile').addEventListener('change',async e=>{
  const file=e.target.files[0];if(!file)return;
- showStatus('Reading '+file.name+'…');
+ showStatus('Reading '+file.name+'â€¦');
  try{
   const text=await file.text(); messages=parseChat(text);
   const counts=new Map();messages.forEach(m=>counts.set(m.name,(counts.get(m.name)||0)+1));
@@ -52,7 +52,7 @@ $('#chatFile').addEventListener('change',async e=>{
   if(!messages.length)throw new Error('No supported timestamped messages were found.');
   await saveChatText(text);
   localStorage.setItem('chatflow_theme',currentTheme);
-  showStatus(`${messages.length.toLocaleString()} messages imported · ${people.length} participants`);
+  showStatus(`${messages.length.toLocaleString()} messages imported Â· ${people.length} participants`);
   $('#overview').classList.remove('hidden'); renderOverview();renderStats();renderReader(true);
   $('#chatTitle').textContent=people.slice(0,2).join(' & ');
   $('#chatSubtitle').textContent=`${messages.length.toLocaleString()} messages`;
@@ -68,7 +68,7 @@ function renderOverview(){
  $('#totalMessages').textContent=messages.length.toLocaleString();$('#participantCount').textContent=people.length;
  const c=countBy(m=>m.person);const vals=people.map(p=>c[p]||0),total=messages.length;
  $('#distribution').innerHTML=people.slice(0,2).map((p,i)=>`<span style="width:${(vals[i]/total*100).toFixed(2)}%;background:${i?'var(--accent2)':'var(--accent)'}"></span>`).join('');
- $('#peopleLegend').innerHTML=people.slice(0,2).map((p,i)=>`<span>● ${safe(p)} <b>${((vals[i]/total)*100).toFixed(1)}%</b></span>`).join('');
+ $('#peopleLegend').innerHTML=people.slice(0,2).map((p,i)=>`<span>â— ${safe(p)} <b>${((vals[i]/total)*100).toFixed(1)}%</b></span>`).join('');
  drawChart($('#activityChart'),Object.entries(countBy(m=>m.date.toISOString().slice(0,10))).slice(-14).map(([k,v])=>[k.slice(5),v]));
 }
 function renderStats(){
@@ -90,20 +90,38 @@ function drawChart(canvas,data){
  for(let i=0;i<4;i++){let y=12+(h-38)*i/3;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(w-8,y);ctx.stroke()}
  data.forEach((d,i)=>{let bh=(h-50)*d[1]/max,x=pad+i*step+step*.22,y=h-25-bh;ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--accent');let r=5;ctx.beginPath();ctx.roundRect(x,y,Math.max(3,step*.55),bh,[r,r,2,2]);ctx.fill();if(data.length<=14||i%3===0){ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--muted');ctx.font='9px sans-serif';ctx.textAlign='center';ctx.fillText(d[0],x+step*.275,h-8)}})
 }
-function renderReader(reset=false){
- const list=filtered||messages;if(reset){visibleStart=Math.max(0,list.length-pageSize)}
- const slice=list.slice(visibleStart,visibleStart+pageSize);let html='',lastDay='';
- slice.forEach((m,i)=>{
-  const day=fmtDate(m.date);if(day!==lastDay){html+=`<div class="day-separator"><span>${safe(day)}</span></div>`;lastDay=day}
-  const mine=m.person===people[0];const prev=slice[i-1];const next=slice[i+1];
-  html+=`<div class="msg-row ${mine?'mine':'theirs'}">${(!prev||prev.person!==m.person)?`<div class="sender">${safe(m.person)}</div>`:''}<div class="bubble">${safe(m.text||' ')}</div><div class="time">${fmtTime(m.date)}</div></div>`;
- });
- $('#chatMessages').innerHTML=html||'<div class="empty-state">No matching messages.</div>';
- $('#chatMessages').scrollTop=$('#chatMessages').scrollHeight;
- $('#messageCountLabel').textContent=`Showing ${slice.length.toLocaleString()} of ${list.length.toLocaleString()}`;
- $('#loadOlder').style.display=visibleStart>0?'inline':'none';
+function appendReaderPage(){
+  const list=filtered||messages;
+  if(visibleStart>=list.length)return;
+  const from=visibleStart,to=Math.min(from+pageSize,list.length);
+  let html='',lastDay=from?fmtDate(list[from-1].date):'';
+  for(let i=from;i<to;i++){
+    const m=list[i],day=fmtDate(m.date);
+    if(day!==lastDay){html+=`<div class="day-separator"><span>${safe(day)}</span></div>`;lastDay=day}
+    const mine=m.person===people[0],prev=list[i-1];
+    html+=`<div class="msg-row ${mine?'mine':'theirs'}">${(!prev||prev.person!==m.person)?`<div class="sender">${safe(m.person)}</div>`:''}<div class="bubble">${safe(m.text||' ')}</div><div class="time">${fmtTime(m.date)}</div></div>`;
+  }
+  $('#chatMessages').insertAdjacentHTML('beforeend',html);
+  visibleStart=to;
+  $('#messageCountLabel').textContent=`Showing ${visibleStart.toLocaleString()} of ${list.length.toLocaleString()}`;
+  $('#loadOlder').style.display='none';
 }
-$('#loadOlder').onclick=()=>{visibleStart=Math.max(0,visibleStart-pageSize);renderReader(false)};
+function renderReader(reset=false){
+  const list=filtered||messages;
+  if(reset){
+    visibleStart=0;
+    $('#chatMessages').innerHTML='';
+    if(!list.length)$('#chatMessages').innerHTML='<div class="empty-state">No matching messages.</div>';
+  }
+  appendReaderPage();
+}
+const chatScroller=$('#chatMessages');
+chatScroller.addEventListener('scroll',()=>{
+  if(chatScroller.scrollTop+chatScroller.clientHeight>=chatScroller.scrollHeight-260){
+    appendReaderPage();
+  }
+});
+$('#loadOlder').style.display='none';
 $('#searchToggle').onclick=()=>{$('#searchBar').classList.toggle('hidden');$('#searchInput').focus()};
 $('#clearSearch').onclick=()=>{$('#searchInput').value='';filtered=null;renderReader(true)};
 $('#searchInput').addEventListener('input',e=>{const q=e.target.value.toLowerCase();filtered=q?messages.filter(m=>m.text.toLowerCase().includes(q)||m.person.toLowerCase().includes(q)):null;renderReader(true)});
